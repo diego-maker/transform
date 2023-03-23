@@ -30,7 +30,7 @@ router.post("/", (req, res) => {
 
         res.sendStatus(200);
      
-        response.data.pipe(fs.createWriteStream('GPTaudio.mp4'))
+        response.data.pipe(fs.createWriteStream('GPTaudio.mp3'))
       })
       .catch(error => {
         res.sendStatus(error);
@@ -43,7 +43,7 @@ router.post("/", (req, res) => {
 
 router.get("/", (req, res) => {
   
-  const filePath = path.join(process.cwd(), 'GPTaudio.mp4');
+  const filePath = path.join(process.cwd(), 'GPTaudio.mp3');
   const stat = fs.statSync(filePath);
   const fileSize = stat.size;
   const range = req.headers.range;
@@ -59,7 +59,7 @@ router.get("/", (req, res) => {
       'Content-Range': `bytes ${start}-${end}/${fileSize}`,
       'Accept-Ranges': 'bytes',
       'Content-Length': chunksize,
-      'Content-Type': 'audio/mp4',
+      'Content-Type': 'audio/mp3',
     };
 
     res.writeHead(206, head);
@@ -67,7 +67,7 @@ router.get("/", (req, res) => {
   } else {
     const head = {
       'Content-Length': fileSize,
-      'Content-Type': 'audio/mp4',
+      'Content-Type': 'audio/mp3',
     };
 
     res.writeHead(200, head);
