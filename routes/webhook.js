@@ -44,6 +44,13 @@ router.post("/", (req, res) => {
 router.get("/", (req, res) => {
   
   const filePath = path.join(process.cwd(), 'GPTaudio.mp3');
+
+  // Verifique se o arquivo existe
+if (fs.existsSync(filePath)) {
+  // Exclua o arquivo existente
+  fs.unlinkSync(filePath);
+}
+
   const stat = fs.statSync(filePath);
   const fileSize = stat.size;
   const range = req.headers.range;
