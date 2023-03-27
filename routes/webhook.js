@@ -9,10 +9,10 @@ const router = express.Router();
 router.post("/", (req, res) => {
 
 
-  if (req.body.acess_token ==  process.env.VALIDATE_TOKEN ) {
-    
+  if (req.body.acess_token == process.env.VALIDATE_TOKEN) {
+
     let text = req.body.text
-   
+
     axios({
       method: 'post',
       url: `${process.env.URL_KEY}/v1/synthesize?voice=pt-BR_IsabelaV3Voice`,
@@ -29,7 +29,12 @@ router.post("/", (req, res) => {
       .then(response => {
 
         res.sendStatus(200);
-     
+        // Verifique se o arquivo existe
+        if (fs.existsSync('GPTaudio.mp3')) {
+          // Exclua o arquivo existente
+          fs.unlinkSync('GPTaudio.mp3');
+        }
+
         response.data.pipe(fs.createWriteStream('GPTaudio.mp3'))
       })
       .catch(error => {
@@ -42,14 +47,9 @@ router.post("/", (req, res) => {
 });
 
 router.get("/", (req, res) => {
-  
+
   const filePath = path.join(process.cwd(), 'GPTaudio.mp3');
 
-  // Verifique se o arquivo existe
-if (fs.existsSync(filePath)) {
-  // Exclua o arquivo existente
-  fs.unlinkSync(filePath);
-}
 
   const stat = fs.statSync(filePath);
   const fileSize = stat.size;
@@ -58,10 +58,10 @@ if (fs.existsSync(filePath)) {
   if (range) {
     const parts = range.replace(/bytes=/, "").split("-");
     const start = parseInt(parts[0], 10);
-    const end = parts[1] ? parseInt(parts[1], 10) : fileSize-1;
+    const end = parts[1] ? parseInt(parts[1], 10) : fileSize - 1;
 
-    const chunksize = (end-start)+1;
-    const file = fs.createReadStream(filePath, {start, end});
+    const chunksize = (end - start) + 1;
+    const file = fs.createReadStream(filePath, { start, end });
     const head = {
       'Content-Range': `bytes ${start}-${end}/${fileSize}`,
       'Accept-Ranges': 'bytes',
