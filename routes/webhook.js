@@ -47,10 +47,7 @@ router.post("/", (req, res) => {
 });
 
 router.get("/", (req, res) => {
-
   const filePath = path.join(process.cwd(), 'GPTaudio.mp3');
-
-
   const stat = fs.statSync(filePath);
   const fileSize = stat.size;
   const range = req.headers.range;
@@ -69,6 +66,8 @@ router.get("/", (req, res) => {
       'Content-Type': 'audio/mp3',
     };
 
+    head['Cache-Control'] = 'no-cache, no-store, must-revalidate';
+
     res.writeHead(206, head);
     file.pipe(res);
   } else {
@@ -77,10 +76,11 @@ router.get("/", (req, res) => {
       'Content-Type': 'audio/mp3',
     };
 
+    head['Cache-Control'] = 'no-cache, no-store, must-revalidate';
+
     res.writeHead(200, head);
     fs.createReadStream(filePath).pipe(res);
   }
-
 });
 
 
