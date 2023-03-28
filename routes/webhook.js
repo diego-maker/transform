@@ -8,10 +8,11 @@ const router = express.Router();
 
 router.post("/", (req, res) => {
 
-
   if (req.body.acess_token == process.env.VALIDATE_TOKEN) {
 
-    let text = req.body.text
+    let text = req.body.text;
+
+    const file = fs.createWriteStream('GPTaudio.mp3');
 
     axios({
       method: 'post',
@@ -28,22 +29,23 @@ router.post("/", (req, res) => {
     })
       .then(response => {
 
-        res.sendStatus(200);
-        // Verifique se o arquivo existe
-        if (fs.existsSync('GPTaudio.mp3')) {
-          // Exclua o arquivo existente
-          fs.unlinkSync('GPTaudio.mp3');
-        }
+        response.data.pipe(file);
 
-        response.data.pipe(fs.createWriteStream('GPTaudio.mp3'))
+        file.on('finish', () => {
+          console.log('File saved successfully.');
+          res.sendStatus(200);
+        });
+
       })
       .catch(error => {
-        res.sendStatus(error);
+        console.error(error);
+        res.sendStatus(500);
       });
 
   } else {
     res.sendStatus(404);
   }
+
 });
 
 router.get("/", (req, res) => {
